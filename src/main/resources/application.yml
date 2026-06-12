@@ -1,0 +1,23 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: br-ai-service
+  ai:
+    openai:
+      # DeepSeek 的 OpenAI 兼容端点;key 走环境变量,默认占位让应用无 key 也能启动
+      base-url: https://api.deepseek.com
+      api-key: ${DEEPSEEK_API_KEY:dummy-key-app-boots-but-llm-calls-fail}
+      chat:
+        options:
+          model: deepseek-chat
+      embedding:
+        # DeepSeek 暂无 embedding 端点;A2 向量化阶段按工单决策(可用本地切词+简单向量或换 provider)
+        enabled: false
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
