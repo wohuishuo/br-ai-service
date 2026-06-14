@@ -25,6 +25,7 @@ AI 服务 embed 一本书
 ```powershell
 # 可选:配置 DeepSeek key
 [Environment]::SetEnvironmentVariable("DEEPSEEK_API_KEY","sk-xxx","User")
+[Environment]::SetEnvironmentVariable("SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL","deepseek-v4-flash","User")
 
 # 确保书库服务 :8082 已启动
 mvn spring-boot:run
@@ -54,7 +55,7 @@ curl -X POST http://localhost:8084/api/ai/ask `
   -d "{\"bookId\":1,\"question\":\"仙石是什么\"}"
 ```
 
-实测无 key 返回:第一引用命中《西游记》第一回第 12 段"那座山正当顶上,有一块仙石..."。
+实测有 key 返回:问题"仙石是什么"会调用 `deepseek-v4-flash`,并引用《西游记》第一回第 12、13 段回答。
 
 ## 项目文档
 

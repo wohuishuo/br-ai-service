@@ -13,11 +13,14 @@ import java.util.Map;
 @Component
 public class DeepSeekClient {
     private final String apiKey;
+    private final String model;
     private final RestClient restClient;
 
     public DeepSeekClient(@Value("${spring.ai.openai.api-key}") String apiKey,
+                          @Value("${spring.ai.openai.chat.options.model:deepseek-chat}") String model,
                           @Value("${spring.ai.openai.base-url}") String baseUrl) {
         this.apiKey = apiKey;
+        this.model = model;
         this.restClient = RestClient.builder().baseUrl(baseUrl).build();
     }
 
@@ -30,7 +33,7 @@ public class DeepSeekClient {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "未配置 DEEPSEEK_API_KEY");
         }
         Map<String, Object> body = Map.of(
-                "model", "deepseek-chat",
+                "model", model,
                 "messages", List.of(Map.of("role", "user", "content", prompt)),
                 "temperature", 0.2
         );

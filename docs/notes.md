@@ -33,3 +33,13 @@ llmKeyConfigured=false
 - `POST /api/ai/summary`:无 key 返回本地摘要;
 - `POST /api/ai/embed {"bookId":1}`:返回 `documentCount=39`;
 - `POST /api/ai/ask {"bookId":1,"question":"仙石是什么"}`:第一引用命中第 12 段仙石原文。
+
+## 五、DeepSeek 模型名要小写
+
+用户口头说的模型是 `DeepSeek-V4-Flash`,但 API 实际接受的是小写:
+
+```text
+deepseek-v4-flash
+```
+
+传 `DeepSeek-V4-Flash` 会得到 400,错误信息会提示支持 `deepseek-v4-pro` 或 `deepseek-v4-flash`。
