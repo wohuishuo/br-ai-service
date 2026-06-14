@@ -1,29 +1,39 @@
-# 🤖 AI 服务 · br-ai-service
+# BookRealm AI Service
 
-**[书域 BookRealm](https://github.com/wohuishuo/book-realm) 电子书平台的 AI 模块(MVP-4)**
+**AI 阅读助手:DeepSeek 接入、章节摘要、RAG 原文问答**
 
-本仓负责让阅读变聪明:从书库拉取章节段落,建立轻量 RAG 索引,让用户围绕原文做摘要和问答。
+这是一个可独立运行的 Spring Boot AI 服务。它从书库服务拉取段落,建立轻量检索索引,再让模型基于原文回答问题,避免“凭空聊天”。
 
-> ✅ MVP-4 第一版已完成:摘要、embed、ask 三个接口可用;无 `DEEPSEEK_API_KEY` 也能启动并返回检索依据;有 key 时可调用 DeepSeek 生成回答。
+[BookRealm 平台书](https://wohuishuo.github.io/book-realm/) · [本服务实战章](https://wohuishuo.github.io/book-realm/project/ai)
 
-## 它解决什么
+## 一分钟理解
 
-AI 不能凭空回答一本书的问题。正确链路是:
+**br-ai-service 让阅读器拥有“问原文”的能力。**
 
+普通聊天模型不知道读者当前看的书。正确做法是先从书库拿到书的段落,按问题检索相关原文,再把这些原文交给 DeepSeek 生成摘要或回答。没有 API key 时,服务仍可启动,并返回检索到的引用依据。
+
+```mermaid
+flowchart LR
+  Library["书库服务\n书/章/段"] --> Embed["POST /api/ai/embed\n建立索引"]
+  App["阅读 App 提问"] --> Ask["POST /api/ai/ask"]
+  Ask --> Search["检索相关段落"]
+  Search --> LLM["DeepSeek 生成回答"]
+  Search --> Cite["返回原文引用"]
 ```
-书库服务(书/章/段)
-   │
-AI 服务 embed 一本书
-   │
-用户提问 → 检索相关段落 → 组 prompt → DeepSeek 回答
-```
 
-没有 key 时,服务仍返回检索到的原文引用,不编造模型回答。
+## 已实现功能
+
+| 能力 | 说明 |
+| --- | --- |
+| 章节摘要 | 对章节文本生成简短摘要 |
+| 书籍 embed | 从书库拉取段落并建立检索索引 |
+| 原文问答 | 根据问题检索相关段落,再生成回答 |
+| 无 key 降级 | 没有 `DEEPSEEK_API_KEY` 也能启动和返回引用依据 |
 
 ## 快速开始
 
 ```powershell
-# 可选:配置 DeepSeek key
+# 可选:配置 DeepSeek
 [Environment]::SetEnvironmentVariable("DEEPSEEK_API_KEY","sk-xxx","User")
 [Environment]::SetEnvironmentVariable("SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL","deepseek-v4-flash","User")
 
@@ -32,7 +42,7 @@ mvn spring-boot:run
 curl http://localhost:8084/api/health
 ```
 
-Swagger: <http://localhost:8084/api/swagger-ui.html>
+Swagger:<http://localhost:8084/api/swagger-ui.html>
 
 ## API
 
@@ -43,7 +53,7 @@ Swagger: <http://localhost:8084/api/swagger-ui.html>
 | POST | `/api/ai/embed` | 从书库拉段落并建立索引 |
 | POST | `/api/ai/ask` | 基于原文问答 |
 
-## 真实验证
+## 验证示例
 
 ```powershell
 curl -X POST http://localhost:8084/api/ai/embed `
@@ -55,23 +65,26 @@ curl -X POST http://localhost:8084/api/ai/ask `
   -d "{\"bookId\":1,\"question\":\"仙石是什么\"}"
 ```
 
-实测有 key 返回:问题"仙石是什么"会调用 `deepseek-v4-flash`,并引用《西游记》第一回第 12、13 段回答。
+实测有 key 时会调用 `deepseek-v4-flash`,并引用《西游记》第一回相关段落回答。
 
-## 项目文档
+## 在 BookRealm 中的位置
+
+| 上游/下游 | 关系 |
+| --- | --- |
+| [br-library-service](https://github.com/wohuishuo/br-library-service) | 提供书籍段落和章节文本 |
+| [br-reader-app](https://github.com/wohuishuo/br-reader-app) | 调用摘要和问答接口 |
+| [book-realm](https://github.com/wohuishuo/book-realm) | 平台总书和完整教学 |
+
+## 文档
 
 | 文档 | 内容 |
 | --- | --- |
 | [`docs/design.md`](docs/design.md) | RAG 链路、接口、取舍 |
 | [`docs/notes.md`](docs/notes.md) | 真实踩坑与验证记录 |
-| [平台书 · MVP-4 实战章](https://wohuishuo.github.io/book-realm/project/ai) | 平台视角讲解 |
+| [平台书实战章](https://wohuishuo.github.io/book-realm/project/ai) | 站在完整平台视角讲解本服务 |
 
 ## 测试
 
 ```powershell
 mvn test
 ```
-
-当前 2 条测试:
-
-- 无 key 时摘要接口返回本地友好结果;
-- embed + ask 能返回相关原文引用。
