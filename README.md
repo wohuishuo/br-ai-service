@@ -9,11 +9,11 @@
 
 ## 快速开始
 
-``powershell
+```powershell
 # 配 key(没有也能起,只是 LLM 调用会失败)
 [Environment]::SetEnvironmentVariable("DEEPSEEK_API_KEY","sk-xxx","User")
 mvn spring-boot:run     # :8084,Swagger: http://localhost:8084/api/swagger-ui.html
 curl http://localhost:8084/api/health   # 看 llmKeyConfigured 是否 true
-``
+```
 
 讲解见平台书:[MVP-4 实战章](https://wohuishuo.github.io/book-realm/project/ai)
