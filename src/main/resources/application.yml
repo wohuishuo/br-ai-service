@@ -21,3 +21,6 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+bookrealm:
+  library-base-url: ${BOOK_REALM_LIBRARY_BASE_URL:http://localhost:8082/api}
