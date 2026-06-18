@@ -1,0 +1,2 @@
+#!/bin/sh
+powershell -ExecutionPolicy Bypass -File scripts/verify.ps1
